@@ -12,7 +12,7 @@ Static website to present "know the score" results of UEFA Euro 2016
   - css
   - js
   - html --> [index.html] (https://sekvenssi.github.io/emkisaveikkaus2016/)
-- libraries from external cdn
+- libraries from external cdn OR using distributed build for E.G. webpack
   - [bootstrap 4] (https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.2/css/bootstrap.min.css)
   - react
     - [react] (https://fb.me/react-15.0.2.js)
