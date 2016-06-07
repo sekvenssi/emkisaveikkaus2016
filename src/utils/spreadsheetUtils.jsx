@@ -3,10 +3,16 @@ import { DATA_SHEET, RESULTS_SHEET } from '../constants/spreadsheets'
 import { momentTime, sortDates } from './dateUtils'
 
 export const mapFixture = (teams, fixture) => {
+  const home = teams.filter(team => fixture.home === team.id)[0]
+  const away = teams.filter(team => fixture.away === team.id)[0]
+  const flagPrefix = 'flag-icon flag-icon-squared flag-icon-'
+
   return Object.assign({}, fixture, {
-    homeName: teams.filter(team => fixture.home === team.id)[0].country,
-    awayName: teams.filter(team => fixture.away === team.id)[0].country,
-    date: momentTime(fixture.year, fixture.month, fixture.day, fixture.hour)
+    homeName: home.country,
+    awayName: away.country,
+    date: momentTime(fixture.year, fixture.month, fixture.day, fixture.hour),
+    homeFlag: flagPrefix + home.flagSrc,
+    awayFlag: flagPrefix + away.flagSrc
   })
 }
 
@@ -32,6 +38,18 @@ export const getData = () => {
     const teamSheet = new SpreadSheet(DATA_SHEET)
 
     teamSheet.load().then(data => {
+      resolve(data)
+    }).catch(function(err) {
+      reject(err)
+    })
+  })
+}
+
+export const getResults = () => {
+  return new Promise((resolve, reject) => {
+    const resultSheet = new SpreadSheet(RESULTS_SHEET)
+
+    resultSheet.load().then(data => {
       resolve(data)
     }).catch(function(err) {
       reject(err)
