@@ -10,6 +10,8 @@ export const mapFixture = (teams, fixture) => {
   return Object.assign({}, fixture, {
     homeName: home.country,
     awayName: away.country,
+    homeAbbreviation: home.lyhenne,
+    awayAbbreviation: away.lyhenne,
     date: momentTime(fixture.year, fixture.month, fixture.day, fixture.hour),
     homeFlag: flagPrefix + home.flagSrc,
     awayFlag: flagPrefix + away.flagSrc

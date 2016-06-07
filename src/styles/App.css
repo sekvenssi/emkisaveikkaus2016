@@ -19,3 +19,25 @@ body {
   border-width: 1px 0;
   background: #666;
 }
+
+.icon-lg {
+  font-size: 5em;
+}
+
+.huge-text {
+  font-size: 37px;
+}
+
+.panel-green {
+  border-color: #5cb85c;
+}
+
+.panel-green .panel-heading {
+    border-color: #5cb85c;
+    color: #fff;
+    background-color: #5cb85c;
+}
+
+.panel-green a {
+    color: #5cb85c;
+}
