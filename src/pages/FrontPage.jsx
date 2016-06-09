@@ -2,17 +2,32 @@ import React from 'react'
 import { getAllFixturesNamed, getNextGames, getPreviousGames, getData, getResults } from '../utils/spreadsheetUtils'
 import 'flag-icon-css/css/flag-icon.min.css'
 import classNames from 'classnames'
-import { Row, Col } from 'react-bootstrap'
+import { Row, Col, Panel } from 'react-bootstrap'
+import { Link } from 'react-router'
 import DashboardPanel from '../components/dashboard/DashboardPanel'
 
 class FrontPage extends React.Component {
   constructor(props) {
     super(props)
     this.componentDidMount = this.componentDidMount.bind(this)
+    this.renderPlayedMatch = this.renderPlayedMatch.bind(this)
     this.state = {
       matches: [],
-      users: []
+      users: [],
+      matchesLoading: true,
+      resultsLoading: true
     }
+  }
+
+  renderPlayedMatch(match, i){
+    return (
+      <Col xs={6} sm={4} key={i}>
+        <Link to={`/match/${match.id}`}>
+          <h6 className="text-center"><span className={classNames(match.homeFlag, 'img-circle')} />{` ${match.homeName} - ${match.awayName} `}<span className={classNames(match.awayFlag, 'img-circle')} /></h6>
+          <p className="text-center">1 - 0</p>
+        </Link>
+      </Col>
+    )
   }
 
   componentDidMount(){
@@ -22,7 +37,8 @@ class FrontPage extends React.Component {
       const fixturesNamed = getAllFixturesNamed(data)
 
       this.setState({
-        matches: fixturesNamed
+        matches: fixturesNamed,
+        matchesLoading: false
       })
 
 
@@ -47,7 +63,8 @@ class FrontPage extends React.Component {
 
 
         this.setState({
-          users: users
+          users: users,
+          resultsLoading: false
         })
 
       })
@@ -75,6 +92,7 @@ class FrontPage extends React.Component {
               icon="user"
             />
           </Col>
+
           <Col xs={6} sm={3} md={3}>
             <DashboardPanel value={59}
               label="Kohdetta"
@@ -84,49 +102,28 @@ class FrontPage extends React.Component {
               icon="briefcase"
             />
           </Col>
+
           <Col xs={12} sm={6}>
-            <Row>
-              <Col xs={12}>
-                <h3 className="text-center">{'Seuraavat matsit'}</h3>
-              </Col>
-
-
-              <Col xs={6} sm={4}>
-                <h5></h5>
-              </Col>
-              <Col xs={6} sm={4}>
-              </Col>
-              <Col xs={6} sm={4}>
-              </Col>
-            </Row>
-            <Row>
-              {nextThree.map((match, i) => {
-                return (
-                  <Col xs={6} sm={4} key={i}>
-                    <h5 className="text-center"><span className={classNames(match.homeFlag, 'img-circle')} />{` ${match.homeName} - ${match.awayName} `}<span className={classNames(match.awayFlag, 'img-circle')} /></h5>
-                    <p className="text-center">1 - 0</p>
-                </Col>
-                )
-              })}
-
-            </Row>
-
+            <Panel header="Viimeisimmät matsit">
+              <Row>
+                {nextThree.map(this.renderPlayedMatch)}
+              </Row>
+            </Panel>
           </Col>
-
         </Row>
-        <table className="table">
-          <tbody>
-            {this.state.matches.map((val, i) => {
-              return(
-                <tr key={i}>
-                  <td>
-                    <h2><span className={classNames(val.homeFlag, 'img-circle')} />{` ${val.homeName} - ${val.awayName} `}<span className={classNames(val.awayFlag, 'img-circle')} /></h2>
-                  </td>
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
+
+        <Row>
+          <Col xs={12} sm={6} md={3}>
+            <Panel>
+              <div className="text-center">
+                <img className="img-circle" src={require('../images/Fabio-Cappello-September-2010.jpg')} alt="Kartsa"/>
+              </div>
+              <h2 className="text-center">Kartsan kaneetit</h2>
+            </Panel>
+          </Col>
+        </Row>
+
+
 
 
       </div>
