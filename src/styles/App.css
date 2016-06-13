@@ -40,3 +40,10 @@ body {
 .panel-green a {
     color: #5cb85c;
 }
+
+.points-green, .points-yellow, .points-red {
+  border: 1px solid #ddd;
+}
+.points-green{ color: #dff0d8; }
+.points-yellow{ color: #fcf8e3;}
+.points-red{ color: #f2dede; }

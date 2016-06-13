@@ -12,18 +12,22 @@ class UserTable extends React.Component {
     const { users } = this.props
 
     return (
-      <Table striped bordered hover>
+      <Table striped bordered hover condensed>
         <thead>
-          <th>Sijoitus</th>
-          <th>Name</th>
-          <th>Points</th>
+          <tr>
+            <th>Sijoitus</th>
+            <th>Name</th>
+            <th>Points</th>
+          </tr>
         </thead>
         <tbody>
           {users.map((user, i) => <UserTableItem key={user.id} ranking={i+1} user={user} />)}
         </tbody>
         <thead>
-          <th colspan="3">{`Yhteensä ${users.length} osallistujaa`}</th>
-        </thead>
+          <tr>
+            <th colSpan="3">{`Yhteensä ${users.length} osallistujaa`}</th>
+          </tr>
+      </thead>
       </Table>
     )
   }

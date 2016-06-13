@@ -6,10 +6,26 @@ import classNames from 'classNames'
 class DashboardPanel extends React.Component {
   constructor(props){
     super(props)
+    this.renderFooter = this.renderFooter.bind(this)
+  }
+
+  renderFooter(){
+    const { linkLocation, disabled, linkText} = this.props
+    return linkText ? (
+      <Link to={linkLocation} className={classNames({disabled: disabled})}>
+        <div className="panel-footer">
+          <span className="pull-left">{linkText}</span>
+          <span className="pull-right">
+            <Glyphicon glyph="circle-arrow-right" />
+          </span>
+          <div className="clearfix"/>
+        </div>
+      </Link>
+    ) : null
   }
 
   render () {
-    const { value, label, panelType, linkText, linkLocation, icon } = this.props
+    const { value, label, panelType, icon } = this.props
 
     return (
         <div className={classNames('panel', 'panel-' + panelType)}>
@@ -24,15 +40,7 @@ class DashboardPanel extends React.Component {
               </Col>
             </Row>
           </div>
-          <Link to={linkLocation}>
-            <div className="panel-footer">
-              <span className="pull-left">{linkText}</span>
-              <span className="pull-right">
-                <Glyphicon glyph="circle-arrow-right" />
-              </span>
-              <div className="clearfix"/>
-            </div>
-          </Link>
+          {this.renderFooter()}
         </div>
     )
   }
@@ -47,7 +55,8 @@ DashboardPanel.propTypes = {
   icon: PropTypes.string,
   panelType: PropTypes.string,
   linkText: PropTypes.string,
-  linkLocation: PropTypes.string
+  linkLocation: PropTypes.string,
+  disabled: PropTypes.boolean
 }
 
 export default DashboardPanel;

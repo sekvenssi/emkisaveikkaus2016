@@ -58,3 +58,13 @@ export const getResults = () => {
     })
   })
 }
+
+export const getKartsanKaneetit = (data) => {
+  const remainingMatches = data.fixtures.map(fixture => {
+    if(fixture.isPlayed === '0'){
+      return fixture.id
+    }
+  })
+
+  return data.kartsan_kaneetit.filter(kaneetti => remainingMatches.includes(kaneetti.matsi_id))
+}
