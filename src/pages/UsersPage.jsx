@@ -1,5 +1,6 @@
 import React from 'react'
 import { getData, getResults } from '../utils/spreadsheetUtils'
+import { getAllUsersBetResults, getUserRanking } from '../utils/resultUtils'
 
 import Loader from '../components/utils/Loader'
 import UserTable from '../components/users/UserTable'
@@ -18,25 +19,28 @@ class UsersPage extends React.Component {
 
   componentDidMount(){
     getResults().then(results => {
-      //TODO grab real points
-      const users = results.users.filter(user => user.enabled === '1').map(user => {
-        return {
-          id: user.id,
-          name: user.Nimi,
-          points: 0
-        }
-      })
+      getData().then(data => {
+        const allUsersBetResult = getAllUsersBetResults(data, results)
+        const users = allUsersBetResult.map(userbet => {
+          return {
+            id: userbet.user.id,
+            name: userbet.user.Nimi,
+            points: userbet.totalScore,
+            ranking: getUserRanking(allUsersBetResult, userbet.user.id)
+          }
+        })
 
-      this.setState({
-        users: users,
-        isLoading: false
+        this.setState({
+          users: users,
+          isLoading: false
+        })
       })
     })
   }
 
   renderUsersTable(){
     const { users, isLoading } = this.state
-    return isLoading ? <Loader /> : <UserTable users={users} />
+    return isLoading ? <Loader /> : <UserTable users={users} footer />
   }
 
   render () {

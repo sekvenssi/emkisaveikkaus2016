@@ -1,3 +1,5 @@
+import { getAllFixturesNamed } from './spreadsheetUtils'
+
 export const getSingleResult = (fixtures, fixtureId) => {
   return fixtures.filter(fixture => parseInt(fixture.id) === fixtureId)[0]
 }
@@ -66,4 +68,68 @@ export const getSingleFixture = (namedFixtures, fixtureId) => {
 
 export const getUserName = (users, userId) => {
   return users.filter(user => user.id === userId)[0].Nimi
+}
+
+export const getSingleUserBetResults = (userBets, namedFixtures) => {
+  let singleMatchScore = 0, singleBetResult = {}, singleResult = {}, singleFixture = {}
+
+  return userBets.map(userBet => {
+    singleMatchScore = 0
+    singleResult = getSingleResult(namedFixtures, userBet.matchId)
+    singleFixture = getSingleFixture(namedFixtures, userBet.matchId)
+    singleBetResult = getBetResult(userBet, singleResult)
+
+    // calculate scores
+    singleMatchScore += singleBetResult.resultBetOk ? 3 : 0
+
+    if(!singleBetResult.resultBetOk){
+      singleMatchScore += singleBetResult.winnerBetOk ? 1 : 0
+    }
+
+    return {
+      matchId: userBet.matchId,
+      homeName: singleFixture.homeName,
+      awayName: singleFixture.awayName,
+      matchScore: singleMatchScore,
+      betHome: userBet.home,
+      betAway: userBet.away,
+      resultHome: singleResult.homegoals,
+      resultAway: singleResult.awaygoals,
+      cssClass: singleBetResult.cssClass
+    }
+  })
+}
+
+export const getAllUsersBetResults = (data, results) => {
+  const { users } = results
+  const namedFixtures = getAllFixturesNamed(data)
+  let userBets = [], betResults = [], totalScore = 0
+
+  const allUserBetResults = users.map(user => {
+    userBets = getUserBets(results, user.id)
+    betResults = getSingleUserBetResults(userBets, namedFixtures)
+    totalScore = betResults.map(betResult => betResult.matchScore).reduce((a, b) => a + b, 0)
+
+    return {
+      user: user,
+      totalScore: totalScore,
+      betResults: betResults
+    }
+  })
+
+  return sortAllUsersByScore(allUserBetResults)
+}
+
+export const sortAllUsersByScore = (allUserBetResults) => {
+  return allUserBetResults.sort((a, b) => b.totalScore - a.totalScore)
+}
+
+export const getTopTen = (data, results) => {
+  return getAllUsersBetResults(data, results).slice(0,10)
+}
+
+export const getUserRanking = (allUsersBetResult, userId) => {
+  const userBet = allUsersBetResult.filter(userBetResult => userBetResult.user.id === userId)[0]
+
+  return allUsersBetResult.indexOf(userBet) + 1
 }

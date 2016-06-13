@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react'
-import { Navbar, Nav, NavItem } from 'react-bootstrap'
+import { Navbar, Nav } from 'react-bootstrap'
 import { Link } from 'react-router'
 
 class MainLayout extends React.Component {
@@ -9,8 +9,9 @@ class MainLayout extends React.Component {
         <Navbar>
           <Navbar.Header>
             <Navbar.Brand>
-              <Link to="/">EM-kisaveikkaus</Link>{' Versio 0.1'}
+              <Link to="/">EM-kisaveikkaus</Link>{' Versio 0.2'}
             </Navbar.Brand>
+            <Navbar.Toggle />
           </Navbar.Header>
           <Navbar.Collapse>
             <Nav pullRight>

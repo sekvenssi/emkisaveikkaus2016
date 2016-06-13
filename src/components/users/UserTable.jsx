@@ -5,7 +5,18 @@ import UserTableItem from './UserTableItem'
 class UserTable extends React.Component {
   constructor(props) {
     super(props)
+    this.renderFooter = this.renderFooter.bind(this)
+  }
 
+  renderFooter(){
+    const { footer, users } = this.props
+    return footer ? (
+      <thead>
+        <tr>
+          <th colSpan="3">{`Yhteensä ${users.length} osallistujaa`}</th>
+        </tr>
+      </thead>
+    ) : null
   }
 
   render () {
@@ -21,13 +32,9 @@ class UserTable extends React.Component {
           </tr>
         </thead>
         <tbody>
-          {users.map((user, i) => <UserTableItem key={user.id} ranking={i+1} user={user} />)}
+          {users.map((user) => <UserTableItem key={user.id} ranking={user.ranking} user={user} />)}
         </tbody>
-        <thead>
-          <tr>
-            <th colSpan="3">{`Yhteensä ${users.length} osallistujaa`}</th>
-          </tr>
-      </thead>
+        {this.renderFooter()}
       </Table>
     )
   }
@@ -44,7 +51,8 @@ UserTable.propTypes = {
       PropTypes.string,
       PropTypes.number
     ])
-  }))
+  })),
+  footer: PropTypes.bool
 }
 
 export default UserTable;

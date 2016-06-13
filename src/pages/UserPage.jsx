@@ -2,7 +2,7 @@ import React, { PropTypes } from 'react'
 import { Row, Col, ListGroup, ListGroupItem } from 'react-bootstrap'
 import classNames from 'classnames'
 import { getData, getResults, getAllFixturesNamed } from '../utils/spreadsheetUtils'
-import { getSingleResult, getUserBets, getBetResult, getSingleFixture, getUserName } from '../utils/resultUtils'
+import { getAllUsersBetResults, getUserRanking } from '../utils/resultUtils'
 import Loader from '../components/utils/Loader'
 import DashboardPanel from '../components/dashboard/DashboardPanel'
 
@@ -18,7 +18,9 @@ class UserPage extends React.Component {
       dataIsLoading: true,
       resultsIsLoading: true,
       totalScore: 0,
-      userName: ''
+      userName: '',
+      ranking: 0,
+      totalUsers: 0
     }
   }
 
@@ -89,8 +91,6 @@ class UserPage extends React.Component {
   componentDidMount(){
     const userId = this.props.params.userId
 
-
-
     getData().then(data => {
       const namedFixtures = getAllFixturesNamed(data)
 
@@ -99,47 +99,16 @@ class UserPage extends React.Component {
       })
 
       getResults().then(results => {
-        const userBets = getUserBets(results, userId)
-        const userName = getUserName(results.users, userId)
-        let totalScore = 0
-        let singleMatchScore = 0
-        let singleBetResult = {}
-        let singleResult = {}
-        let singleFixture = {}
-
-        const betResults = userBets.map(userBet => {
-          singleMatchScore = 0
-          singleResult = getSingleResult(data.fixtures, userBet.matchId)
-          singleFixture = getSingleFixture(namedFixtures, userBet.matchId)
-          singleBetResult = getBetResult(userBet, singleResult)
-
-          // calculate scores
-          singleMatchScore += singleBetResult.resultBetOk ? 3 : 0
-
-          if(!singleBetResult.resultBetOk){
-            singleMatchScore += singleBetResult.winnerBetOk ? 1 : 0
-          }
-
-          totalScore += singleMatchScore
-
-          return {
-            matchId: userBet.matchId,
-            homeName: singleFixture.homeName,
-            awayName: singleFixture.awayName,
-            matchScore: singleMatchScore,
-            betHome: userBet.home,
-            betAway: userBet.away,
-            resultHome: singleResult.homegoals,
-            resultAway: singleResult.awaygoals,
-            cssClass: singleBetResult.cssClass
-          }
-        })
+        const allUsersBetResult = getAllUsersBetResults(data, results)
+        const userBetResults = allUsersBetResult.filter(userBetResult => userBetResult.user.id === userId)[0]
 
         this.setState({
-          totalScore: totalScore,
-          matchRows: betResults,
+          totalScore: userBetResults.totalScore,
+          matchRows: userBetResults.betResults,
           resultsIsLoading: false,
-          userName: userName
+          userName: userBetResults.user.Nimi,
+          ranking: getUserRanking(allUsersBetResult, userId),
+          totalUsers: allUsersBetResult.length
         })
 
       })
@@ -147,7 +116,7 @@ class UserPage extends React.Component {
   }
 
   render () {
-    const { resultsIsLoading, matchRows, userName, totalScore } = this.state
+    const { resultsIsLoading, matchRows, userName, totalScore, ranking, totalUsers } = this.state
 
 
     return (
@@ -157,11 +126,18 @@ class UserPage extends React.Component {
             <h1>{userName}<small>{' - Veikkaukset'}</small></h1>
             <hr/>
           </Col>
-          <Col xs={6} sm={3} md={3}>
+          <Col xs={12} sm={3} md={3}>
             <DashboardPanel value={totalScore}
               label="Kokonaispisteet"
               panelType="primary"
               icon="signal"
+            />
+          </Col>
+          <Col xs={12} sm={3} md={3}>
+            <DashboardPanel value={`${ranking} / ${totalUsers}`}
+              label="Sijoitus"
+              panelType="green"
+              icon="star"
             />
           </Col>
         </Row>

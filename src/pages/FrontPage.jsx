@@ -1,10 +1,15 @@
 import React from 'react'
-import { getAllFixturesNamed, getNextGames, getPreviousGames, getData, getResults, getKartsanKaneetit } from '../utils/spreadsheetUtils'
-import 'flag-icon-css/css/flag-icon.min.css'
 import classNames from 'classnames'
 import { Row, Col, Panel } from 'react-bootstrap'
 import { Link } from 'react-router'
+
+import { getAllFixturesNamed, getPreviousGames, getData, getResults, getKartsanKaneetit } from '../utils/spreadsheetUtils'
+import { getTopTen, getUserRanking } from '../utils/resultUtils'
+import 'flag-icon-css/css/flag-icon.min.css'
+
 import DashboardPanel from '../components/dashboard/DashboardPanel'
+import UserTable from '../components/users/UserTable'
+import Loader from '../components/utils/Loader'
 
 class FrontPage extends React.Component {
   constructor(props) {
@@ -12,13 +17,20 @@ class FrontPage extends React.Component {
     this.componentDidMount = this.componentDidMount.bind(this)
     this.renderPlayedMatch = this.renderPlayedMatch.bind(this)
     this.renderKartsanKaneetit = this.renderKartsanKaneetit.bind(this)
+    this.renderTopTen = this.renderTopTen.bind(this)
     this.state = {
       matches: [],
       users: [],
       matchesLoading: true,
       resultsLoading: true,
-      kartsanKaneetit: []
+      kartsanKaneetit: [],
+      topTen: []
     }
+  }
+
+  renderTopTen(){
+    const { resultsLoading , topTen} = this.state
+    return resultsLoading ? <Loader /> : <UserTable users={topTen} />
   }
 
   renderKartsanKaneetit(){
@@ -63,6 +75,7 @@ class FrontPage extends React.Component {
       const fixturesNamed = getAllFixturesNamed(data)
       const kartsanKaneetit = getKartsanKaneetit(data)
 
+
       this.setState({
         matches: fixturesNamed,
         matchesLoading: false,
@@ -70,11 +83,22 @@ class FrontPage extends React.Component {
       })
 
       getResults().then(results => {
-        const users = results.users.filter(user => user.enabled === "1")
+        const users = results.users.filter(user => user.enabled === '1')
+        const topTenResults = getTopTen(data, results)
+        const topTen = topTenResults.map(userbet => {
+          return {
+            id: userbet.user.id,
+            name: userbet.user.Nimi,
+            points: userbet.totalScore,
+            ranking: getUserRanking(topTenResults, userbet.user.id)
+          }
+        })
+
 
         this.setState({
           users: users,
-          resultsLoading: false
+          resultsLoading: false,
+          topTen: topTen
         })
 
       })
@@ -85,19 +109,14 @@ class FrontPage extends React.Component {
     const { users, matches, resultsLoading } = this.state
     const previousThree = getPreviousGames(matches, 3)
 
-    //FIXME oma kompjonentti
-
-
     return (
-
-
 
       <div>
         <h1>{'3 Step It Uefa Euro 2016 - Veikkaus'}</h1>
         <hr/>
 
         <Row>
-          <Col xs={6} sm={3} md={3}>
+          <Col xs={12} sm={3} md={3}>
             <DashboardPanel value={users.length}
               label="Veikkaajaa"
               panelType="primary"
@@ -108,7 +127,7 @@ class FrontPage extends React.Component {
             />
           </Col>
 
-          <Col xs={6} sm={3} md={3}>
+          <Col xs={12} sm={3} md={3}>
             <DashboardPanel value={59}
               label="Kohdetta"
               panelType="green"
@@ -130,6 +149,11 @@ class FrontPage extends React.Component {
         <Row>
           <Col xs={12} sm={6}>
             {this.renderKartsanKaneetit()}
+          </Col>
+          <Col xs={12} sm={6}>
+            <Panel header='Top 10'>
+              {this.renderTopTen()}
+            </Panel>
           </Col>
         </Row>
 

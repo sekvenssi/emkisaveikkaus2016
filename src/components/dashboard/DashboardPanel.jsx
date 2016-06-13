@@ -49,7 +49,8 @@ class DashboardPanel extends React.Component {
 DashboardPanel.propTypes = {
   value: PropTypes.oneOfType([
     PropTypes.string,
-    PropTypes.number
+    PropTypes.number,
+    PropTypes.node
   ]),
   label: PropTypes.string,
   icon: PropTypes.string,
