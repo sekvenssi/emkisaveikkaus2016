@@ -34,7 +34,7 @@ class FrontPage extends React.Component {
   }
 
   renderKartsanKaneetit(){
-    const { kartsanKaneetit } = this.state
+    const { kartsanKaneetit, resultsLoading } = this.state
     const kartsaHeader = (
       <div>
         <div className="text-center">
@@ -44,14 +44,16 @@ class FrontPage extends React.Component {
       </div>
     )
 
+    const allKaneetit = kartsanKaneetit.map((kaneetti, i) => {
+        return <h4>{`#${i+1} ${kaneetti.kaneetti}`}</h4>
+    })
+
+
+
     return (
-      <Panel header={kartsaHeader}>
-        {kartsanKaneetit.map((kaneetti, i) => {
-          return (
-            <h4>{`#${i+1} ${kaneetti.kaneetti}`}</h4>
-          )
-        })}
-      </Panel>
+      <div>
+        { allKaneetit.length === 0 ? null : <Panel header={kartsaHeader}>{ resultsLoading ? <Loader /> : allKaneetit}</Panel>}
+      </div>
     )
   }
 
@@ -124,6 +126,7 @@ class FrontPage extends React.Component {
               linkLocation="/users"
               icon="user"
               disabled={resultsLoading}
+              loading={resultsLoading}
             />
           </Col>
 

@@ -1,8 +1,8 @@
 import React, { PropTypes } from 'react'
 import { Row, Col, ListGroup, ListGroupItem } from 'react-bootstrap'
 import classNames from 'classnames'
-import { getData, getResults, getAllFixturesNamed } from '../utils/spreadsheetUtils'
-import { getAllUsersBetResults, getUserRanking } from '../utils/resultUtils'
+import { getData, getResults } from '../utils/spreadsheetUtils'
+import { getAllUsersBetResults, getUserRanking, getSpecialBetResults } from '../utils/resultUtils'
 import Loader from '../components/utils/Loader'
 import DashboardPanel from '../components/dashboard/DashboardPanel'
 
@@ -13,6 +13,8 @@ class UserPage extends React.Component {
     this.renderMatchRows = this.renderMatchRows.bind(this)
     this.renderMatchRow = this.renderMatchRow.bind(this)
     this.renderLabels = this.renderLabels.bind(this)
+    this.renderSpecialRows = this.renderSpecialRows.bind(this)
+    this.renderSpecialBet = this.renderSpecialBet.bind(this)
     this.state = {
       matchRows: [],
       dataIsLoading: true,
@@ -20,8 +22,43 @@ class UserPage extends React.Component {
       totalScore: 0,
       userName: '',
       ranking: 0,
-      totalUsers: 0
+      totalUsers: 0,
+      specialBets: []
     }
+  }
+
+  renderSpecialBet(specialBet){
+    const { id, question, result, isPlayed, points, userPoints } = specialBet
+    const cssClass = specialBet.cssClass || ''
+    const { resultsIsLoading } = this.state
+
+    return (
+      <ListGroupItem key={id} bsStyle={cssClass}>
+        <Row>
+          <Col xs={10}>
+            <span>{question}</span>
+          </Col>
+          <Col xs={2}>
+            <div className="pull-right">
+              { resultsIsLoading ? 'loading...' : <strong>{userPoints || 0}</strong> }
+            </div>
+          </Col>
+        </Row>
+      </ListGroupItem>
+    )
+  }
+
+  renderSpecialRows(){
+    const { dataIsLoading, specialBets } = this.state
+
+    return dataIsLoading ? <Loader /> : (
+      <div>
+        <h4>Erikoiskysymykset</h4>
+          <ListGroup>
+            {specialBets.map(this.renderSpecialBet)}
+          </ListGroup>
+      </div>
+    )
   }
 
   renderLabels(){
@@ -92,9 +129,10 @@ class UserPage extends React.Component {
     const userId = this.props.params.userId
 
     getData().then(data => {
-      const namedFixtures = getAllFixturesNamed(data)
+      const specialBetResults = getSpecialBetResults(data)
 
       this.setState({
+        specialBets: specialBetResults,
         dataIsLoading: false
       })
 
@@ -131,6 +169,7 @@ class UserPage extends React.Component {
               label="Kokonaispisteet"
               panelType="primary"
               icon="signal"
+              loading={resultsIsLoading}
             />
           </Col>
           <Col xs={12} sm={3} md={3}>
@@ -138,12 +177,18 @@ class UserPage extends React.Component {
               label="Sijoitus"
               panelType="green"
               icon="star"
+              loading={resultsIsLoading}
             />
           </Col>
         </Row>
         <Row>
           <Col xs={12}>
             {this.renderMatchRows()}
+          </Col>
+        </Row>
+        <Row>
+          <Col xs={12}>
+            {this.renderSpecialRows()}
           </Col>
         </Row>
       </div>

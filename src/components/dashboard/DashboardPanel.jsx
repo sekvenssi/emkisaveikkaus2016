@@ -2,6 +2,7 @@ import React, { PropTypes } from 'react'
 import { Row, Col, Glyphicon } from 'react-bootstrap'
 import { Link } from 'react-router'
 import classNames from 'classNames'
+import Loader from '../utils/Loader'
 
 class DashboardPanel extends React.Component {
   constructor(props){
@@ -25,7 +26,7 @@ class DashboardPanel extends React.Component {
   }
 
   render () {
-    const { value, label, panelType, icon } = this.props
+    const { value, label, panelType, icon, loading } = this.props
 
     return (
         <div className={classNames('panel', 'panel-' + panelType)}>
@@ -35,8 +36,13 @@ class DashboardPanel extends React.Component {
                 <span className={classNames('glyphicon', 'glyphicon-' + icon, 'icon-lg')} />
               </Col>
               <Col xs={9}>
-                <div className="text-right huge-text">{value}</div>
-                <div className="text-right">{label}</div>
+                {loading ? <div className="pull-right"><Loader type='loader-mini' /></div> : (
+                    <div>
+                      <div className="text-right huge-text">{value}</div>
+                      <div className="text-right">{label}</div>
+                    </div>
+                  )
+                }
               </Col>
             </Row>
           </div>
@@ -57,7 +63,8 @@ DashboardPanel.propTypes = {
   panelType: PropTypes.string,
   linkText: PropTypes.string,
   linkLocation: PropTypes.string,
-  disabled: PropTypes.boolean
+  disabled: PropTypes.boolean,
+  loading: PropTypes.boolean
 }
 
 export default DashboardPanel;

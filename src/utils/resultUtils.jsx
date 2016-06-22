@@ -133,3 +133,8 @@ export const getUserRanking = (allUsersBetResult, userId) => {
 
   return allUsersBetResult.indexOf(userBet) + 1
 }
+
+export const getSpecialBetResults = (data) => {
+  return data.erkkarit
+  //.filter(erkkari => erkkari.isPlayed === '1')
+}
