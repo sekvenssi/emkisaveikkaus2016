@@ -103,17 +103,25 @@ export const getSingleUserBetResults = (userBets, namedFixtures) => {
 export const getAllUsersBetResults = (data, results) => {
   const { users } = results
   const namedFixtures = getAllFixturesNamed(data)
-  let userBets = [], betResults = [], totalScore = 0
+  const specialBetResults = getSpecialBetResults(data)
+  let userBets = [], betResults = [], userSpecialBets = [], userSpecialBetResults = [], totalScore = 0
 
   const allUserBetResults = users.map(user => {
     userBets = getUserBets(results, user.id)
     betResults = getSingleUserBetResults(userBets, namedFixtures)
-    totalScore = betResults.map(betResult => betResult.matchScore).reduce((a, b) => a + b, 0)
+    userSpecialBets = getUserSpecialBets(results.erkkarit, user.id)
+    userSpecialBetResults = getUserSpecialBetResults(userSpecialBets, specialBetResults)
+
+    // count total
+    totalScore = 0
+    totalScore += betResults.map(betResult => betResult.matchScore).reduce((a, b) => a + b, 0)
+    totalScore += userSpecialBetResults.totalScore
 
     return {
       user: user,
       totalScore: totalScore,
-      betResults: betResults
+      betResults: betResults,
+      specialBetResults: userSpecialBetResults
     }
   })
 
@@ -136,5 +144,43 @@ export const getUserRanking = (allUsersBetResult, userId) => {
 
 export const getSpecialBetResults = (data) => {
   return data.erkkarit
-  //.filter(erkkari => erkkari.isPlayed === '1')
+}
+
+export const getUserSpecialBets = (specialbets, userId) => {
+  return specialbets.filter(specialBet => specialBet.id === userId)[0]
+}
+
+export const getUserSpecialBetResults = (userSpecialBets, specialBetResults) => {
+  let success = false
+
+  const specialBetRows = specialBetResults.map(sbr => {
+    if(sbr.isPlayed === '0'){
+      return Object.assign({}, sbr, { userPoints: 0 })
+    }
+
+    switch(sbr.resultCheckType){
+      case 'equals':
+        success = handleSpecialEquals(sbr, userSpecialBets)
+        return Object.assign({}, sbr, {
+          userPoints: success ? parseInt(sbr.points) : 0,
+          cssClass: success ? 'success' : 'danger'
+        })
+      default:
+        return Object.assign({}, sbr, { userPoints: 0 })
+    }
+  })
+
+  return {
+    specialBetRows: specialBetRows,
+    totalScore: getSpecialBetRowsTotalScore(specialBetRows)
+  }
+
+}
+
+export const handleSpecialEquals = (specialBetResult, userBetResult) => {
+  return specialBetResult.result === userBetResult['e_' + specialBetResult.id]
+}
+
+export const getSpecialBetRowsTotalScore = (specialBetRows) => {
+  return specialBetRows.map(sbr => sbr.userPoints).reduce((a, b) => a + b, 0)
 }

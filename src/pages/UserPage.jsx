@@ -2,7 +2,7 @@ import React, { PropTypes } from 'react'
 import { Row, Col, ListGroup, ListGroupItem } from 'react-bootstrap'
 import classNames from 'classnames'
 import { getData, getResults } from '../utils/spreadsheetUtils'
-import { getAllUsersBetResults, getUserRanking, getSpecialBetResults } from '../utils/resultUtils'
+import { getAllUsersBetResults, getUserRanking, getSpecialBetResults, getUserSpecialBets, getUserSpecialBetResults } from '../utils/resultUtils'
 import Loader from '../components/utils/Loader'
 import DashboardPanel from '../components/dashboard/DashboardPanel'
 
@@ -36,7 +36,7 @@ class UserPage extends React.Component {
       <ListGroupItem key={id} bsStyle={cssClass}>
         <Row>
           <Col xs={10}>
-            <span>{question}</span>
+            <span>{`${question} [Max ${points}p.]`}</span>
           </Col>
           <Col xs={2}>
             <div className="pull-right">
@@ -139,6 +139,10 @@ class UserPage extends React.Component {
       getResults().then(results => {
         const allUsersBetResult = getAllUsersBetResults(data, results)
         const userBetResults = allUsersBetResult.filter(userBetResult => userBetResult.user.id === userId)[0]
+        const userSpecialBets = getUserSpecialBets(results.erkkarit, userId)
+        const UserSpecialBetResults = getUserSpecialBetResults(userSpecialBets, specialBetResults)
+
+
 
         this.setState({
           totalScore: userBetResults.totalScore,
@@ -146,7 +150,8 @@ class UserPage extends React.Component {
           resultsIsLoading: false,
           userName: userBetResults.user.Nimi,
           ranking: getUserRanking(allUsersBetResult, userId),
-          totalUsers: allUsersBetResult.length
+          totalUsers: allUsersBetResult.length,
+          specialBets: UserSpecialBetResults.specialBetRows
         })
 
       })

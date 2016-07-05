@@ -9,7 +9,7 @@ class MainLayout extends React.Component {
         <Navbar>
           <Navbar.Header>
             <Navbar.Brand>
-              <Link to="/">EM-kisaveikkaus</Link>{' Versio 0.2'}
+              <Link to="/">EM-kisaveikkaus</Link>{' Versio 0.3'}
             </Navbar.Brand>
             <Navbar.Toggle />
           </Navbar.Header>
