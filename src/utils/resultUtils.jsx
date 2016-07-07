@@ -1,4 +1,5 @@
 import { getAllFixturesNamed } from './spreadsheetUtils'
+import _ from 'underscore'
 
 export const getSingleResult = (fixtures, fixtureId) => {
   return fixtures.filter(fixture => parseInt(fixture.id) === fixtureId)[0]
@@ -165,6 +166,12 @@ export const getUserSpecialBetResults = (userSpecialBets, specialBetResults) => 
           userPoints: success ? parseInt(sbr.points) : 0,
           cssClass: success ? 'success' : 'danger'
         })
+      case 'contains':
+        success = handleSpecialContains(sbr, userSpecialBets)
+        return Object.assign({}, sbr, {
+          userPoints: success ? parseInt(sbr.points) : 0,
+          cssClass: success ? 'success' : 'danger'
+        })
       default:
         return Object.assign({}, sbr, { userPoints: 0 })
     }
@@ -179,6 +186,13 @@ export const getUserSpecialBetResults = (userSpecialBets, specialBetResults) => 
 
 export const handleSpecialEquals = (specialBetResult, userBetResult) => {
   return specialBetResult.result === userBetResult['e_' + specialBetResult.id]
+}
+
+export const handleSpecialContains = (specialBetResult, userSpecialBets) => {
+  const range = _.range(parseInt(specialBetResult.containsStart), parseInt(specialBetResult.containsEnd))
+  const containsBets = range.map(r => userSpecialBets['e_' + r])
+
+  return containsBets.indexOf(specialBetResult.result) > -1
 }
 
 export const getSpecialBetRowsTotalScore = (specialBetRows) => {
