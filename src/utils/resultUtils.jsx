@@ -172,6 +172,12 @@ export const getUserSpecialBetResults = (userSpecialBets, specialBetResults) => 
           userPoints: success ? parseInt(sbr.points) : 0,
           cssClass: success ? 'success' : 'danger'
         })
+      case 'contains2':
+        success = handleSpecialContains2(sbr, userSpecialBets, specialBetResults)
+        return Object.assign({}, sbr, {
+          userPoints: success ? parseInt(sbr.points) : 0,
+          cssClass: success ? 'success' : 'danger'
+        })
       default:
         return Object.assign({}, sbr, { userPoints: 0 })
     }
@@ -186,6 +192,15 @@ export const getUserSpecialBetResults = (userSpecialBets, specialBetResults) => 
 
 export const handleSpecialEquals = (specialBetResult, userBetResult) => {
   return specialBetResult.result === userBetResult['e_' + specialBetResult.id]
+}
+
+export const handleSpecialContains2 = (specialBetResult, userSpecialBets, specialBetResults) => {
+  const range = _.range(parseInt(specialBetResult.containsStart), parseInt(specialBetResult.containsEnd))
+  const rangeString = range.map(r => r.toString())
+  const containsResults = specialBetResults.filter(sbr => rangeString.indexOf(sbr.id) > -1).map(sbr2 => sbr2.result)
+  const userBet = userSpecialBets['e_' + specialBetResult.id]
+
+  return containsResults.indexOf(userBet) > -1
 }
 
 export const handleSpecialContains = (specialBetResult, userSpecialBets) => {

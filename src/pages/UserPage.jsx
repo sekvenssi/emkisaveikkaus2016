@@ -55,7 +55,7 @@ class UserPage extends React.Component {
       <div>
         <h4>Erikoiskysymykset</h4>
           <ListGroup>
-            {specialBets.map(this.renderSpecialBet)}
+            {specialBets.filter(sb => sb.isVisible === "1").map(this.renderSpecialBet)}
           </ListGroup>
       </div>
     )
